@@ -11,7 +11,7 @@ emojicon = ':kaaba:'
 webhookurl = 'https://hooks.slack.com/services/<secret>'
 
 advminutes = 10
-start_message = f'Hai, {username} akan membantu mengingatkan jadwal sholat sekitar {advminutes} menit sebelum waktu adzan berkumandang.\nBerikut jadwal sholat untuk {cityname} hari ini:\n'
+start_message = f'Hai, {username} akan membantu mengingatkan jadwal sholat sekitar {advminutes} menit sebelum waktu adzan berkumandang.\n\nBerikut jadwal sholat {cityname} hari ini:\n'
 
 
 def slack_sender(name: str, time: datetime):
@@ -53,15 +53,10 @@ def convert_prayer_name(name: str) -> str:
 
 
 def reminder_prayertime(name: str, time: str):
-    time_sched = substract_10_mins(time)
+    time_sched = substract_10_mins(name, time)
     today = datetime.today()
     today_date = datetime(today.year, today.month, today.day,
                           time_sched.hour, time_sched.minute)
-
-    name = convert_prayer_name(name)
-    time_prayer = time_sched.strftime('%H:%M')
-    global start_message
-    start_message += f'{name} {time_prayer}\n'
 
     slack_sender(name, today_date)
     pass
@@ -89,8 +84,15 @@ def fetch_prayertimes():
     pass
 
 
-def substract_10_mins(time_str: str) -> time:
+def substract_10_mins(name: str, time_str: str) -> time:
     datetime_obj = datetime.strptime(time_str, '%I:%M %p')
+
+    name = convert_prayer_name(name)
+    time_prayer = datetime_obj.strftime('%H:%M')
+
+    global start_message
+    start_message += f'{name} {time_prayer}\n'
+
     datetime_obj -= timedelta(minutes=advminutes)
 
     return datetime_obj
