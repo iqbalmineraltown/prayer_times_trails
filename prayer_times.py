@@ -57,7 +57,7 @@ def reminder_prayertime(name: str, time: str):
     today = datetime.today()
     today_date = datetime(today.year, today.month, today.day,
                           time_sched.hour, time_sched.minute)
-
+    name = convert_prayer_name(name)
     slack_sender(name, today_date)
     pass
 
